@@ -1,4 +1,4 @@
-namespace AzureContainerApps;
+namespace Ummati.Infrastructure;
 
 public static class EnvironmentName
 {

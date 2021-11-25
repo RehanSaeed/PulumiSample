@@ -1,8 +1,0 @@
-config:
-  azure-native:location: northeurope
-  foobar:ApplicationName: foobar
-  foobar:CommonLocation: northeurope
-  foobar:ContainerImageName: mcr.microsoft.com/dotnet/samples:aspnetapp
-  foobar:Environment: development
-  foobar:Locations:
-    - canadacentral

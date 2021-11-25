@@ -1,0 +1,8 @@
+config:
+  ummati:ApplicationName: ummati
+  ummati:CommonLocation: northeurope
+  ummati:ContainerImageName: mcr.microsoft.com/dotnet/samples:aspnetapp
+  ummati:Environment: development
+  ummati:Locations:
+    - canadacentral
+    - northeurope

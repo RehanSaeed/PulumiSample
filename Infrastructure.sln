@@ -5,7 +5,20 @@ VisualStudioVersion = 17.1.31903.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{A176DF4B-C60B-416E-9879-397E8F6F0B4E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureContainerApps", "Source\AzureContainerApps\AzureContainerApps.csproj", "{44F95B00-65B0-41BB-97AF-D6313587D468}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ummati.Infrastructure", "Source\Ummati.Infrastructure\Ummati.Infrastructure.csproj", "{0D404CDB-12D6-4361-AFAA-A1E74511FA34}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3AFC4673-3A84-4DF7-8F91-1F6248C120B3}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{90C208F0-AC3A-440E-A0EA-E107ABDA52B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ummati.Infrastructure.Test", "Tests\Ummati.Infrastructure.Test\Ummati.Infrastructure.Test.csproj", "{E5F7788C-2854-4635-B1C8-57619FD810B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,16 +26,21 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{44F95B00-65B0-41BB-97AF-D6313587D468}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{44F95B00-65B0-41BB-97AF-D6313587D468}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{44F95B00-65B0-41BB-97AF-D6313587D468}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{44F95B00-65B0-41BB-97AF-D6313587D468}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D404CDB-12D6-4361-AFAA-A1E74511FA34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D404CDB-12D6-4361-AFAA-A1E74511FA34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D404CDB-12D6-4361-AFAA-A1E74511FA34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D404CDB-12D6-4361-AFAA-A1E74511FA34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5F7788C-2854-4635-B1C8-57619FD810B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5F7788C-2854-4635-B1C8-57619FD810B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5F7788C-2854-4635-B1C8-57619FD810B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5F7788C-2854-4635-B1C8-57619FD810B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{44F95B00-65B0-41BB-97AF-D6313587D468} = {A176DF4B-C60B-416E-9879-397E8F6F0B4E}
+		{0D404CDB-12D6-4361-AFAA-A1E74511FA34} = {A176DF4B-C60B-416E-9879-397E8F6F0B4E}
+		{E5F7788C-2854-4635-B1C8-57619FD810B3} = {90C208F0-AC3A-440E-A0EA-E107ABDA52B3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75F86AD7-5AC6-4CB0-B7D1-403735140818}

@@ -1,4 +1,4 @@
-namespace AzureContainerApps;
+namespace Ummati.Infrastructure;
 
 using Pulumi;
 using Pulumi.AzureNative.OperationalInsights.Inputs;
@@ -26,7 +26,7 @@ public class AzureContainerAppStack : Stack
             var containerApp = GetContainerApp(location, resourceGroup, kubeEnvironment);
             var url = Output.Format($"https://{containerApp.Configuration.Apply(x => x!.Ingress).Apply(x => x!.Fqdn)}");
             containerAppUrls.Add(url);
-}
+        }
 
         this.Urls = Output.All(containerAppUrls);
     }
@@ -92,7 +92,7 @@ public class AzureContainerAppStack : Stack
                     {
                         CustomerId = workspace.CustomerId,
                         SharedKey = workspacePrimarySharedKey,
-                    }
+                    },
                 },
                 Location = resourceGroup.Location,
                 ResourceGroupName = resourceGroup.Name,
@@ -116,24 +116,25 @@ public class AzureContainerAppStack : Stack
                     Ingress = new IngressArgs
                     {
                         External = true,
-                        TargetPort = 80
+                        TargetPort = 80,
                     },
-                    //Registries = {
-                    //    //new RegistryCredentialsArgs
-                    //    //{
-                    //    //    Server = registry.LoginServer,
-                    //    //    Username = adminUsername,
-                    //    //    PasswordSecretRef = "pwd"
-                    //    //}
-                    //},
-                    //Secrets =
-                    //{
-                    //    new SecretArgs
-                    //    {
-                    //        Name = "pwd",
-                    //        Value = adminPassword
-                    //    }
-                    //},
+
+                    // Registries = {
+                    //     //new RegistryCredentialsArgs
+                    //     //{
+                    //     //    Server = registry.LoginServer,
+                    //     //    Username = adminUsername,
+                    //     //    PasswordSecretRef = "pwd"
+                    //     //}
+                    // },
+                    // Secrets =
+                    // {
+                    //     new SecretArgs
+                    //     {
+                    //         Name = "pwd",
+                    //         Value = adminPassword
+                    //     }
+                    // },
                 },
                 Template = new TemplateArgs
                 {
@@ -146,9 +147,9 @@ public class AzureContainerAppStack : Stack
                             Resources = new ContainerResourcesArgs()
                             {
                                 Cpu = 0.25,
-                                Memory = "0.5Gi"
+                                Memory = "0.5Gi",
                             },
-                        }
+                        },
                     },
                     Scale = new ScaleArgs()
                     {
@@ -163,12 +164,12 @@ public class AzureContainerAppStack : Stack
                                 {
                                     Metadata = new Dictionary<string, string>()
                                     {
-                                        { "ConcurrentRequests", "10" }
+                                        { "ConcurrentRequests", "10" },
                                     },
                                 },
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 },
                 Tags = GetTags(),
             },
@@ -179,6 +180,6 @@ public class AzureContainerAppStack : Stack
                     Create = TimeSpan.FromHours(1),
                     Update = TimeSpan.FromHours(1),
                     Delete = TimeSpan.FromHours(1),
-                }
+                },
             });
 }

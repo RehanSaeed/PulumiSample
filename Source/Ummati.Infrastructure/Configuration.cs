@@ -1,9 +1,11 @@
-namespace AzureContainerApps;
+namespace Ummati.Infrastructure;
 
 using System.Text.Json;
 using Pulumi;
 
+#pragma warning disable CA1724 // Conflicts with System.Configuration
 public static class Configuration
+#pragma warning restore CA1724 // Conflicts with System.Configuration
 {
     private static readonly Config Config = new();
 
