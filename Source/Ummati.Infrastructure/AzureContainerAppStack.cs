@@ -1,12 +1,12 @@
 namespace Ummati.Infrastructure;
 
+using System.Collections.Immutable;
 using Pulumi;
+using Pulumi.AzureNative.OperationalInsights;
 using Pulumi.AzureNative.OperationalInsights.Inputs;
 using Pulumi.AzureNative.Resources;
 using Pulumi.AzureNative.Web.V20210301;
 using Pulumi.AzureNative.Web.V20210301.Inputs;
-using Pulumi.AzureNative.OperationalInsights;
-using System.Collections.Immutable;
 
 #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
 public class AzureContainerAppStack : Stack
@@ -43,7 +43,7 @@ public class AzureContainerAppStack : Stack
 
     private static ResourceGroup GetResourceGroup(string name, string location) =>
         new(
-            $"{Configuration.ApplicationName}-{name}-{location}-{Configuration.Environment}",
+            $"{Configuration.ApplicationName}-{name}-{location}-{Configuration.Environment}-",
             new ResourceGroupArgs()
             {
                 Location = location,
