@@ -21,6 +21,7 @@ jobs:
         with:
           command: up
           stack-name: development
+          work-dir: Source/Ummati.Infrastructure
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - name: Azure CLI script
