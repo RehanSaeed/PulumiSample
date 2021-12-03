@@ -1,8 +1,14 @@
 config:
+  azure:clientId: def16a99-d59c-4d9b-89d2-a85e3f91ec82
+  azure:clientSecret:
+    secure: AAABAMyGqjzjoaS04/P175Mm0veDEVD12HbegngfCgbgyyxdgdenhjDUsBiiVlERY43EVCWxNSJTWA3dASw1843W
+  azure:subscriptionId: dc01c77f-7452-4828-b574-3330cfbc06df
+  azure:tenantId: 7d8ca406-ffc4-41d6-ae03-a297a0943b62
+
   ummati:ApplicationName: ummati
   ummati:CommonLocation: northeurope
   ummati:ContainerImageName: mcr.microsoft.com/dotnet/samples:aspnetapp
   ummati:Environment: development
   ummati:Locations:
-    - canadacentral
-    - northeurope
+  - canadacentral
+  - northeurope
