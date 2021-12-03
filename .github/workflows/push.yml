@@ -1,4 +1,4 @@
-name: "Pulumi Up"
+name: Deploy
 
 on:
   push:
@@ -15,14 +15,23 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
-  up:
-    name: Up
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2.4.0
       - name: "Install .NET SDK"
         uses: actions/setup-dotnet@v1.9.0
+      - name: "Dotnet Tool Restore"
+        run: dotnet tool restore
+        shell: pwsh
+      - name: "Dotnet Cake Build"
+        run: dotnet cake --target=Build
+        shell: pwsh
+      - name: "Dotnet Cake Test"
+        run: dotnet cake --target=Test
+        shell: pwsh
       - name: "Pulumi Up"
         uses: pulumi/actions@v3.12.1
         with:

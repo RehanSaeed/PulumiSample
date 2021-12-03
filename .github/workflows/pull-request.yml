@@ -1,4 +1,4 @@
-name: "Pulumi Preview"
+name: Preview
 
 on:
   pull_request:
@@ -21,6 +21,15 @@ jobs:
         uses: actions/checkout@v2.4.0
       - name: "Install .NET SDK"
         uses: actions/setup-dotnet@v1.9.0
+      - name: "Dotnet Tool Restore"
+        run: dotnet tool restore
+        shell: pwsh
+      - name: "Dotnet Cake Build"
+        run: dotnet cake --target=Build
+        shell: pwsh
+      - name: "Dotnet Cake Test"
+        run: dotnet cake --target=Test
+        shell: pwsh
       - name: "Pulumi Preview"
         uses: pulumi/actions@v3.12.1
         with:
