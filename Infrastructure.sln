@@ -13,12 +13,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
+		global.json = global.json
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{90C208F0-AC3A-440E-A0EA-E107ABDA52B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ummati.Infrastructure.Test", "Tests\Ummati.Infrastructure.Test\Ummati.Infrastructure.Test.csproj", "{E5F7788C-2854-4635-B1C8-57619FD810B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ummati.Infrastructure.Test", "Tests\Ummati.Infrastructure.Test\Ummati.Infrastructure.Test.csproj", "{E5F7788C-2854-4635-B1C8-57619FD810B3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{3891D491-6579-4334-AF54-D3A6CF0B6647}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{191A6629-35CC-416A-BB38-C464A22CC9CD}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
+		.github\workflows\pull-request.yml = .github\workflows\pull-request.yml
+		.github\workflows\push.yml = .github\workflows\push.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +51,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{0D404CDB-12D6-4361-AFAA-A1E74511FA34} = {A176DF4B-C60B-416E-9879-397E8F6F0B4E}
 		{E5F7788C-2854-4635-B1C8-57619FD810B3} = {90C208F0-AC3A-440E-A0EA-E107ABDA52B3}
+		{3891D491-6579-4334-AF54-D3A6CF0B6647} = {3AFC4673-3A84-4DF7-8F91-1F6248C120B3}
+		{191A6629-35CC-416A-BB38-C464A22CC9CD} = {3891D491-6579-4334-AF54-D3A6CF0B6647}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {75F86AD7-5AC6-4CB0-B7D1-403735140818}
