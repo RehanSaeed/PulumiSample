@@ -11,12 +11,10 @@ jobs:
       - uses: actions/checkout@v2
       - name: "Install .NET Core SDK"
         uses: actions/setup-dotnet@v1.9.0
-      - name: Configure Azure Credentials
-        #uses: aws-actions/configure-aws-credentials@v1
-        #with:
-        #  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        #  aws-region: ${{ secrets.AWS_REGION }}
-        #  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
       - uses: pulumi/actions@v3
         with:
           command: preview
