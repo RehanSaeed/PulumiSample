@@ -171,7 +171,7 @@ public class AzureContainerAppStack : Stack
                                 {
                                     Metadata = new Dictionary<string, string>()
                                     {
-                                        { "concurrentRequests", "50" },
+                                        { "concurrentRequests", "30" },
                                     },
                                 },
                             },
