@@ -14,6 +14,11 @@ public class AzureContainerAppStack : Stack
 {
     public AzureContainerAppStack()
     {
+        if (Configuration is null)
+        {
+            Configuration = new Configuration();
+        }
+
         var commonResourceGroup = GetResourceGroup("common", Configuration.CommonLocation);
         var workspace = GetWorkspace(Configuration.CommonLocation, commonResourceGroup);
         var workspacePrimarySharedKey = GetWorkspacePrimarySharedKey(commonResourceGroup, workspace);
@@ -30,6 +35,8 @@ public class AzureContainerAppStack : Stack
 
         this.Urls = Output.All(containerAppUrls);
     }
+
+    public static IConfiguration Configuration { get; set; } = default!;
 
     [Output]
     public Output<ImmutableArray<string>> Urls { get; private set; }
@@ -164,7 +171,7 @@ public class AzureContainerAppStack : Stack
                                 {
                                     Metadata = new Dictionary<string, string>()
                                     {
-                                        { "concurrentRequests", "10" },
+                                        { "concurrentRequests", "50" },
                                     },
                                 },
                             },

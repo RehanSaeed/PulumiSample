@@ -4,23 +4,23 @@ using System.Text.Json;
 using Pulumi;
 
 #pragma warning disable CA1724 // Conflicts with System.Configuration
-public static class Configuration
+public class Configuration : IConfiguration
 #pragma warning restore CA1724 // Conflicts with System.Configuration
 {
-    private static readonly Config Config = new();
+    private readonly Config config = new();
 
-    public static string ApplicationName => Config.Require(nameof(ApplicationName));
+    public string ApplicationName => this.config.Require(nameof(this.ApplicationName));
 
-    public static string CommonLocation => Config.Require(nameof(CommonLocation));
+    public string CommonLocation => this.config.Require(nameof(this.CommonLocation));
 
-    public static IEnumerable<string> Locations =>
-        Config
-            .RequireObject<JsonElement>(nameof(Locations))
+    public IEnumerable<string> Locations =>
+        this.config
+            .RequireObject<JsonElement>(nameof(this.Locations))
             .EnumerateArray()
             .Select(x => x.GetString()!)
             .Where(x => x is not null);
 
-    public static string Environment => Config.Require(nameof(Environment));
+    public string Environment => this.config.Require(nameof(this.Environment));
 
-    public static string ContainerImageName => Config.Require(nameof(ContainerImageName));
+    public string ContainerImageName => this.config.Require(nameof(this.ContainerImageName));
 }
