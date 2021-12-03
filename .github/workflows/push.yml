@@ -1,33 +1,33 @@
-name: Pulumi
+name: "Pulumi Up"
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+env:
+  # Disable the .NET logo in the console output.
+  DOTNET_NOLOGO: true
+  # Disable the .NET first time experience to skip caching NuGet packages and speed up the build.
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Disable sending .NET CLI telemetry to Microsoft.
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
-  preview:
-    name: Update
+  up:
+    name: Up
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: "Install .NET Core SDK"
+      - name: "Checkout"
+        uses: actions/checkout@v2.4.0
+      - name: "Install .NET SDK"
         uses: actions/setup-dotnet@v1.9.0
-      #- name: Azure Login
-      #  uses: Azure/login@v1
-      #  with:
-      #    creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - uses: pulumi/actions@v3
+      - name: "Pulumi Up"
+        uses: pulumi/actions@v3.12.1
         with:
           command: up
           stack-name: development
           work-dir: Source/Ummati.Infrastructure
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-      - name: Azure CLI script
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az logout
-            az cache purge
-            az account clear
