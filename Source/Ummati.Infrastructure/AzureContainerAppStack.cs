@@ -2,11 +2,14 @@ namespace Ummati.Infrastructure;
 
 using System.Collections.Immutable;
 using Pulumi;
+using Pulumi.AzureNative.Network;
+using Pulumi.AzureNative.Network.Inputs;
 using Pulumi.AzureNative.OperationalInsights;
 using Pulumi.AzureNative.OperationalInsights.Inputs;
 using Pulumi.AzureNative.Resources;
 using Pulumi.AzureNative.Web.V20210301;
 using Pulumi.AzureNative.Web.V20210301.Inputs;
+using EndpointArgs = Pulumi.AzureNative.Network.Inputs.EndpointArgs;
 
 #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
 public class AzureContainerAppStack : Stack
@@ -23,23 +26,31 @@ public class AzureContainerAppStack : Stack
         var workspace = GetWorkspace(Configuration.CommonLocation, commonResourceGroup);
         var workspacePrimarySharedKey = GetWorkspacePrimarySharedKey(commonResourceGroup, workspace);
 
-        var containerAppUrls = new List<Output<string>>();
+        var containerAppOutputs = new List<Output<ContainerAppOutput>>();
         foreach (var location in Configuration.Locations)
         {
             var resourceGroup = GetResourceGroup("app", location);
             var kubeEnvironment = GetKubeEnvironment(location, resourceGroup, workspace, workspacePrimarySharedKey);
             var containerApp = GetContainerApp(location, resourceGroup, kubeEnvironment);
-            var url = Output.Format($"https://{containerApp.Configuration.Apply(x => x!.Ingress).Apply(x => x!.Fqdn)}");
-            containerAppUrls.Add(url);
+
+            var containerAppOutput = containerApp.Configuration
+                .Apply(x => x!.Ingress)
+                .Apply(x => new ContainerAppOutput(location, x!.Fqdn, $"https://{x!.Fqdn}"));
+            containerAppOutputs.Add(containerAppOutput);
         }
 
-        this.Urls = Output.All(containerAppUrls);
+        var containerApps = Output.All(containerAppOutputs);
+
+        var trafficManager = GetTrafficManager(commonResourceGroup, containerApps);
     }
 
     public static IConfiguration Configuration { get; set; } = default!;
 
-    [Output]
-    public Output<ImmutableArray<string>> Urls { get; private set; }
+    // [Output]
+    // public Output<ImmutableArray<ContainerAppOutput>> ContainerApps { get; private set; }
+
+    // [Output]
+    // public Output<string> TrafficManagerFqdn { get; private set; }
 
     private static Dictionary<string, string> GetTags() =>
         new()
@@ -189,4 +200,48 @@ public class AzureContainerAppStack : Stack
                     Delete = TimeSpan.FromHours(1),
                 },
             });
+
+    private static Profile GetTrafficManager(
+        ResourceGroup commonResourceGroup,
+        Output<ImmutableArray<ContainerAppOutput>> containerAppOutput)
+    {
+        var name = string.Equals(Configuration.Environment, EnvironmentName.Production, StringComparison.Ordinal) ?
+            "ummati-" :
+            $"ummati-{Configuration.Environment}-";
+
+        var endpoints = containerAppOutput.Apply(
+            containerApps => containerApps.Select(containerApp => new EndpointArgs()
+            {
+                Name = $"endpoint-{containerApp.Location}",
+                EndpointStatus = EndpointStatus.Enabled,
+                Target = containerApp.Fqdn,
+                Type = "Microsoft.Network/trafficManagerProfiles/externalEndpoints",
+                EndpointLocation = containerApp.Location,
+            }));
+
+        return new(
+            name,
+            new ProfileArgs()
+            {
+                DnsConfig = new DnsConfigArgs()
+                {
+                    RelativeName = "ummati-development",
+                    Ttl = 60,
+                },
+                Endpoints = endpoints,
+                Location = "global",
+                MaxReturn = 0,
+                MonitorConfig = new MonitorConfigArgs()
+                {
+                    Path = "/",
+                    Port = 443,
+                    Protocol = MonitorProtocol.HTTPS,
+                },
+                ProfileStatus = ProfileStatus.Enabled,
+                ResourceGroupName = commonResourceGroup.Name,
+                TrafficRoutingMethod = TrafficRoutingMethod.Performance,
+                TrafficViewEnrollmentStatus = "Disabled",
+                Tags = GetTags(),
+            });
+    }
 }
