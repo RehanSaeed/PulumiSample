@@ -1,10 +1,9 @@
 config:
-  azure-native:clientId: def16a99-d59c-4d9b-89d2-a85e3f91ec82
+  azure-native:clientId: 56e5f9a6-2305-4d16-b10a-b59863a45bea
   azure-native:clientSecret:
-    secure: AAABAMyGqjzjoaS04/P175Mm0veDEVD12HbegngfCgbgyyxdgdenhjDUsBiiVlERY43EVCWxNSJTWA3dASw1843W
+    secure: AAABAH1E90xVU7pwVhUID+3W0dpGTAXg7hNqTjReFZ4EnQ/QbhpU2ObElgk2ujx10e9mQPmpYOsvdY8AF5vzVprC
   azure-native:subscriptionId: dc01c77f-7452-4828-b574-3330cfbc06df
   azure-native:tenantId: 7d8ca406-ffc4-41d6-ae03-a297a0943b62
-
   ummati:ApplicationName: ummati
   ummati:CommonLocation: northeurope
   ummati:ContainerImageName: mcr.microsoft.com/dotnet/samples:aspnetapp
