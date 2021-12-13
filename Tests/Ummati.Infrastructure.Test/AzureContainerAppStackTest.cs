@@ -32,9 +32,13 @@ public class AzureContainerAppStackTest
             if (tagsOutput is not null)
             {
                 var tags = await OutputUtilities.GetValueAsync(tagsOutput).ConfigureAwait(false);
+
                 Assert.NotNull(tags);
                 Assert.Equal("test-app", tags![TagName.Application]);
                 Assert.Equal("test", tags![TagName.Environment]);
+                var location = tags![TagName.Location];
+                Assert.True(string.Equals("northeurope", location, StringComparison.Ordinal) ||
+                    string.Equals("canadacentral", location, StringComparison.Ordinal));
             }
         }
     }

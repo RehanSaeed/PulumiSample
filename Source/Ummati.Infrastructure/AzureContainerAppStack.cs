@@ -42,7 +42,7 @@ public class AzureContainerAppStack : Stack
 
         this.ContainerApps = Output.All(containerAppOutputs.Select(x => x.Apply(y => y.Url)));
 
-        var trafficManager = GetTrafficManager(commonResourceGroup, containerAppOutputs);
+        var trafficManager = GetTrafficManager(Configuration.CommonLocation, commonResourceGroup, containerAppOutputs);
         this.TrafficManagerUrl = Output.Format($"https://{trafficManager.DnsConfig.Apply(x => x!.RelativeName)}");
     }
 
@@ -54,11 +54,12 @@ public class AzureContainerAppStack : Stack
     [Output]
     public Output<string> TrafficManagerUrl { get; private set; }
 
-    private static Dictionary<string, string> GetTags() =>
+    private static Dictionary<string, string> GetTags(string location) =>
         new()
         {
             { TagName.Application, Configuration.ApplicationName },
             { TagName.Environment, Configuration.Environment },
+            { TagName.Location, location },
         };
 
     private static ResourceGroup GetResourceGroup(string name, string location) =>
@@ -67,7 +68,7 @@ public class AzureContainerAppStack : Stack
             new ResourceGroupArgs()
             {
                 Location = location,
-                Tags = GetTags(),
+                Tags = GetTags(location),
             });
 
     private static Workspace GetWorkspace(string location, ResourceGroup resourceGroup) =>
@@ -82,7 +83,7 @@ public class AzureContainerAppStack : Stack
                 {
                     Name = WorkspaceSkuNameEnum.PerGB2018,
                 },
-                Tags = GetTags(),
+                Tags = GetTags(location),
             });
 
     private static Output<string> GetWorkspacePrimarySharedKey(ResourceGroup resourceGroup, Workspace workspace)
@@ -116,7 +117,7 @@ public class AzureContainerAppStack : Stack
                 },
                 Location = resourceGroup.Location,
                 ResourceGroupName = resourceGroup.Name,
-                Tags = GetTags(),
+                Tags = GetTags(location),
                 Type = "Managed",
             });
 
@@ -200,10 +201,11 @@ public class AzureContainerAppStack : Stack
                         },
                     },
                 },
-                Tags = GetTags(),
+                Tags = GetTags(location),
             });
 
     private static Profile GetTrafficManager(
+        string location,
         ResourceGroup commonResourceGroup,
         List<Output<(string Location, string Fqdn, string Url)>> containerAppOutputs)
     {
@@ -231,7 +233,7 @@ public class AzureContainerAppStack : Stack
                 })));
 
         return new(
-            $"traffic-manager-{Configuration.CommonLocation}-{Configuration.Environment}-",
+            $"traffic-manager-{location}-{Configuration.Environment}-",
             new ProfileArgs()
             {
                 DnsConfig = new DnsConfigArgs()
@@ -269,7 +271,7 @@ public class AzureContainerAppStack : Stack
                 ResourceGroupName = commonResourceGroup.Name,
                 TrafficRoutingMethod = TrafficRoutingMethod.Performance,
                 TrafficViewEnrollmentStatus = "Disabled",
-                Tags = GetTags(),
+                Tags = GetTags(location),
             });
     }
 }
