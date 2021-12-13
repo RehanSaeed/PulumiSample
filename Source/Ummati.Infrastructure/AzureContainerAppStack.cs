@@ -2,7 +2,6 @@ namespace Ummati.Infrastructure;
 
 using System.Collections.Immutable;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using Pulumi;
 using Pulumi.AzureNative.Network;
 using Pulumi.AzureNative.Network.Inputs;
