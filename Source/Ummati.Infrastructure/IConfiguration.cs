@@ -13,4 +13,14 @@ public interface IConfiguration
     string Environment { get; }
 
     string ContainerImageName { get; }
+
+    double ContainerCpu { get; }
+
+    string ContainerMemory { get; }
+
+    int ContainerMaxReplicas { get; }
+
+    int ContainerMinReplicas { get; }
+
+    int ContainerConcurrentRequests { get; }
 }

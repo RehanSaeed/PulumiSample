@@ -15,6 +15,11 @@ public class AzureContainerAppStackTest
             ApplicationName = "test-app",
             CommonLocation = "northeurope",
             ContainerImageName = "image-name",
+            ContainerCpu = 1,
+            ContainerMemory = "0.5Gi",
+            ContainerMaxReplicas = 10,
+            ContainerMinReplicas = 1,
+            ContainerConcurrentRequests = 10,
             Environment = "test",
             Locations = ImmutableArray.Create("northeurope", "canadacentral"),
         };

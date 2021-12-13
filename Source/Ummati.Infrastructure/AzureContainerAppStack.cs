@@ -1,6 +1,8 @@
 namespace Ummati.Infrastructure;
 
 using System.Collections.Immutable;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 using Pulumi;
 using Pulumi.AzureNative.Network;
 using Pulumi.AzureNative.Network.Inputs;
@@ -26,7 +28,7 @@ public class AzureContainerAppStack : Stack
         var workspace = GetWorkspace(Configuration.CommonLocation, commonResourceGroup);
         var workspacePrimarySharedKey = GetWorkspacePrimarySharedKey(commonResourceGroup, workspace);
 
-        var containerAppOutputs = new List<Output<ContainerAppOutput>>();
+        var containerAppOutputs = new List<Output<(string Location, string Fqdn, string Url)>>();
         foreach (var location in Configuration.Locations)
         {
             var resourceGroup = GetResourceGroup("app", location);
@@ -35,22 +37,23 @@ public class AzureContainerAppStack : Stack
 
             var containerAppOutput = containerApp.Configuration
                 .Apply(x => x!.Ingress)
-                .Apply(x => new ContainerAppOutput(location, x!.Fqdn, $"https://{x!.Fqdn}"));
+                .Apply(x => (location, x!.Fqdn, $"https://{x!.Fqdn}"));
             containerAppOutputs.Add(containerAppOutput);
         }
 
-        var containerApps = Output.All(containerAppOutputs);
+        this.ContainerApps = Output.All(containerAppOutputs.Select(x => x.Apply(y => y.Url)));
 
-        var trafficManager = GetTrafficManager(commonResourceGroup, containerApps);
+        var trafficManager = GetTrafficManager(commonResourceGroup, containerAppOutputs);
+        this.TrafficManagerUrl = Output.Format($"https://{trafficManager.DnsConfig.Apply(x => x!.RelativeName)}");
     }
 
     public static IConfiguration Configuration { get; set; } = default!;
 
-    // [Output]
-    // public Output<ImmutableArray<ContainerAppOutput>> ContainerApps { get; private set; }
+    [Output]
+    public Output<ImmutableArray<string>> ContainerApps { get; private set; }
 
-    // [Output]
-    // public Output<string> TrafficManagerFqdn { get; private set; }
+    [Output]
+    public Output<string> TrafficManagerUrl { get; private set; }
 
     private static Dictionary<string, string> GetTags() =>
         new()
@@ -133,6 +136,7 @@ public class AzureContainerAppStack : Stack
                 {
                     Ingress = new IngressArgs
                     {
+                        AllowInsecure = true,
                         External = true,
                         TargetPort = 80,
                     },
@@ -164,15 +168,23 @@ public class AzureContainerAppStack : Stack
                             Image = Configuration.ContainerImageName,
                             Resources = new ContainerResourcesArgs()
                             {
-                                Cpu = 0.25,
-                                Memory = "0.5Gi",
+                                Cpu = Configuration.ContainerCpu,
+                                Memory = Configuration.ContainerMemory,
+                            },
+                            Env = new List<EnvironmentVarArgs>()
+                            {
+                                new EnvironmentVarArgs()
+                                {
+                                    Name = "AllowedHosts",
+                                    Value = "*",
+                                },
                             },
                         },
                     },
                     Scale = new ScaleArgs()
                     {
-                        MinReplicas = 1,
-                        MaxReplicas = 10,
+                        MinReplicas = Configuration.ContainerMinReplicas,
+                        MaxReplicas = Configuration.ContainerMaxReplicas,
                         Rules = new List<ScaleRuleArgs>()
                         {
                             new ScaleRuleArgs()
@@ -182,7 +194,7 @@ public class AzureContainerAppStack : Stack
                                 {
                                     Metadata = new Dictionary<string, string>()
                                     {
-                                        { "concurrentRequests", "30" },
+                                        { "concurrentRequests", Configuration.ContainerConcurrentRequests.ToString(CultureInfo.InvariantCulture) },
                                     },
                                 },
                             },
@@ -190,43 +202,43 @@ public class AzureContainerAppStack : Stack
                     },
                 },
                 Tags = GetTags(),
-            },
-            new CustomResourceOptions()
-            {
-                CustomTimeouts = new CustomTimeouts()
-                {
-                    Create = TimeSpan.FromHours(1),
-                    Update = TimeSpan.FromHours(1),
-                    Delete = TimeSpan.FromHours(1),
-                },
             });
 
     private static Profile GetTrafficManager(
         ResourceGroup commonResourceGroup,
-        Output<ImmutableArray<ContainerAppOutput>> containerAppOutput)
+        List<Output<(string Location, string Fqdn, string Url)>> containerAppOutputs)
     {
-        var name = string.Equals(Configuration.Environment, EnvironmentName.Production, StringComparison.Ordinal) ?
-            "ummati-" :
-            $"ummati-{Configuration.Environment}-";
+        var dnsName = string.Equals(Configuration.Environment, EnvironmentName.Production, StringComparison.Ordinal) ?
+            "ummati" :
+            $"ummati-{Configuration.Environment}";
 
-        var endpoints = containerAppOutput.Apply(
-            containerApps => containerApps.Select(containerApp => new EndpointArgs()
-            {
-                Name = $"endpoint-{containerApp.Location}",
-                EndpointStatus = EndpointStatus.Enabled,
-                Target = containerApp.Fqdn,
-                Type = "Microsoft.Network/trafficManagerProfiles/externalEndpoints",
-                EndpointLocation = containerApp.Location,
-            }));
+        var endpoints = Output.All(containerAppOutputs
+            .Select(containerAppOutput => containerAppOutput.Apply(containerApp =>
+                new EndpointArgs()
+                {
+                    Name = $"endpoint-{containerApp.Location}",
+                    EndpointStatus = EndpointStatus.Enabled,
+                    Target = containerApp.Fqdn,
+                    Type = "Microsoft.Network/trafficManagerProfiles/externalEndpoints",
+                    EndpointLocation = containerApp.Location,
+                    CustomHeaders = new List<EndpointPropertiesCustomHeadersArgs>()
+                    {
+                        new EndpointPropertiesCustomHeadersArgs()
+                        {
+                            Name = "Host",
+                            Value = containerApp.Fqdn,
+                        },
+                    },
+                })));
 
         return new(
-            name,
+            $"traffic-manager-{Configuration.CommonLocation}-{Configuration.Environment}-",
             new ProfileArgs()
             {
                 DnsConfig = new DnsConfigArgs()
                 {
-                    RelativeName = "ummati-development",
-                    Ttl = 60,
+                    RelativeName = dnsName,
+                    Ttl = 1,
                 },
                 Endpoints = endpoints,
                 Location = "global",
@@ -236,6 +248,23 @@ public class AzureContainerAppStack : Stack
                     Path = "/",
                     Port = 443,
                     Protocol = MonitorProtocol.HTTPS,
+                    ExpectedStatusCodeRanges = new List<MonitorConfigExpectedStatusCodeRangesArgs>()
+                    {
+                        new MonitorConfigExpectedStatusCodeRangesArgs()
+                        {
+                            Min = 200,
+                            Max = 299,
+                        },
+                    },
+
+                    // CustomHeaders = new List<MonitorConfigCustomHeadersArgs>()
+                    // {
+                    //     new MonitorConfigCustomHeadersArgs()
+                    //     {
+                    //         Name = "Host",
+                    //         Value = dnsName,
+                    //     },
+                    // },
                 },
                 ProfileStatus = ProfileStatus.Enabled,
                 ResourceGroupName = commonResourceGroup.Name,

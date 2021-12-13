@@ -6,7 +6,12 @@ config:
   azure-native:tenantId: 7d8ca406-ffc4-41d6-ae03-a297a0943b62
   ummati:ApplicationName: ummati
   ummati:CommonLocation: northeurope
-  ummati:ContainerImageName: mcr.microsoft.com/dotnet/samples:aspnetapp
+  ummati:ContainerImageName: muhammadrehansaeed/api:0.0.0-preview.0
+  ummati:ContainerCpu: 0.25
+  ummati:ContainerMemory: 0.5Gi
+  ummati:ContainerMinReplicas: 1
+  ummati:ContainerMaxReplicas: 10
+  ummati:ContainerConcurrentRequests: 50
   ummati:Environment: development
   ummati:Locations:
   - canadacentral

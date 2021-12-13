@@ -1,5 +1,6 @@
 namespace Ummati.Infrastructure;
 
+using System.Globalization;
 using System.Text.Json;
 using Pulumi;
 
@@ -23,4 +24,14 @@ public class Configuration : IConfiguration
     public string Environment => this.config.Require(nameof(this.Environment));
 
     public string ContainerImageName => this.config.Require(nameof(this.ContainerImageName));
+
+    public double ContainerCpu => double.Parse(this.config.Require(nameof(this.ContainerCpu)), CultureInfo.InvariantCulture);
+
+    public string ContainerMemory => this.config.Require(nameof(this.ContainerMemory));
+
+    public int ContainerMaxReplicas => int.Parse(this.config.Require(nameof(this.ContainerMaxReplicas)), CultureInfo.InvariantCulture);
+
+    public int ContainerMinReplicas => int.Parse(this.config.Require(nameof(this.ContainerMinReplicas)), CultureInfo.InvariantCulture);
+
+    public int ContainerConcurrentRequests => int.Parse(this.config.Require(nameof(this.ContainerConcurrentRequests)), CultureInfo.InvariantCulture);
 }
